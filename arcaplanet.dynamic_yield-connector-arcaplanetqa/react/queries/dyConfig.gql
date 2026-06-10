@@ -1,0 +1,21 @@
+query {
+  appSettings {
+    account
+    apiKey
+    apiSecret
+    vtexApiKey
+    vtexApiToken
+    boolSandbox
+    salesChannel
+    locales
+    productDataCustomFields
+    productSpecifications
+    skuSpecifications
+    flagExportDisableSKU
+    flagExportOutOfStockSKU
+    flagCheckValidGTIN
+    listExludedSkus
+    feedFormat
+    domainShop
+  }
+}

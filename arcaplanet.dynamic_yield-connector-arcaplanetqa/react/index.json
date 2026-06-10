@@ -1,0 +1,29 @@
+[
+  {
+    "id": "admin/dynamic_yield-connector.config-saved"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.loading"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-tab-label"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-save-config-button"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-create-feed-button"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-show-feed-button"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-import-orders-button"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.stats-tab-label"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.logs-tab-label"
+  }
+]

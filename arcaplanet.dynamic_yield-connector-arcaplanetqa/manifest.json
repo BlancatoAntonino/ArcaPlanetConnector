@@ -1,0 +1,189 @@
+{
+  "vendor": "arcaplanetqa",
+  "name": "dynamic-yield",
+  "version": "0.1.0",
+  "title": "Dynamic Yield Connector",
+  "icon": "https://www.dynamicyield.com/wp-content/uploads/2019/10/DY-Hero_Logo-Black@x2.png",
+  "description": "Dynamic Yield Connector for VTEX (Arcaplanet Custom)",
+  "credentialType": "absolute",
+  "defaultLocale": "it-IT",
+  "builders": {
+    "graphql": "2.x",
+    "react": "3.x",
+    "admin": "0.x",
+    "node": "7.x",
+    "messages": "1.x"
+  },
+  "mustUpdateAt": "2025-08-24",
+  "categories": [],
+  "registries": [
+    "smartcheckout"
+  ],
+  "dependencies": {
+    "vtex.styleguide": "9.x",
+    "vtex.store-graphql": "2.x"
+  },
+  "billingOptions": {
+    "free": true,
+    "support": {
+      "url": "https://support.vtex.com/hc/requests"
+    },
+    "type": "free",
+    "availableCountries": [
+      "*"
+    ]
+  },
+  "settingsSchema": {
+    "title": "Arcaplanet - SalesForce API App",
+    "type": "object",
+    "properties": {
+      "dynamicYield": {
+        "title": "Dynamic Yield settings",
+        "type": "object",
+        "properties": {
+          "hostName": {
+            "title": "HostName",
+            "type": "string",
+            "default": "https://dy-api.eu"
+          },
+          "feedId": {
+            "title": "Product feedId",
+            "type": "string"
+          },
+          "api_key": {
+            "title": "Api key",
+            "type": "string"
+          },
+          "productBatchSize": {
+            "title": "Number of products update per request",
+            "type": "number",
+            "default": 100
+          },
+          "isFranchiseStock_Enabled": {
+            "title": "Enable Franchise Stock",
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "vtexSettings": {
+        "title": "Vtex settings",
+        "type": "object",
+        "properties": {
+          "isRangeFetch_Enabled": {
+            "title": "Enable Range Fetch - Franchise availability",
+            "type": "boolean",
+            "default": true
+          },
+          "sellerIndex_Start": {
+            "title": "First franchise seller Index",
+            "type": "number",
+            "default": "https://dy-api.eu"
+          },
+          "sellerIndex_End": {
+            "title": "Last franchise seller Index",
+            "type": "number"
+          },
+          "sellerIndexToFetch": {
+            "title": "Franchise seller Index to fetch (comma separated)",
+            "type": "string",
+            "default": ""
+          },
+          "batchSellerSize": {
+            "title": "Number of franchises to fetch in a single batch",
+            "type": "number",
+            "default": 10
+          },
+          "fullHours": {
+            "title": "Hour to execute full update (comma separated)",
+            "type": "string",
+            "default": "6,20"
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "postreleasy": "vtex publish --verbose"
+  },
+  "policies": [
+    {
+      "name": "colossus-write-logs"
+    },
+    {
+      "name": "ADMIN_DS"
+    },
+    {
+      "name": "vbase-read-write"
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/api/catalog_system/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/api/vlm/account/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "portal.vtexcommercestable.com.br",
+        "path": "/api/tenant/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexcommercestable.com.br",
+        "path": "/XMLData/*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.vtexpayments.com.br",
+        "path": "*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "{{account}}.myvtex.com",
+        "path": "*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "dy-api.eu",
+        "path": "*"
+      }
+    },
+    {
+      "name": "outbound-access",
+      "attrs": {
+        "host": "api.vtex.com",
+        "path": "/dataentities/*"
+      }
+    },
+    {
+      "name": "Get_Account_By_Identifier"
+    },
+    {
+      "name": "ViewPayments"
+    },
+    {
+      "name": "AcessaTodosCarrinhos"
+    },
+    {
+      "name": "AcessaTodosPedidos"
+    }
+  ],
+  "$schema": "https://raw.githubusercontent.com/vtex/node-vtex-api/master/gen/manifest.schema"
+}

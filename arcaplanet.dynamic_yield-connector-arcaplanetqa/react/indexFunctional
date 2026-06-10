@@ -1,0 +1,389 @@
+import React, { useState, useEffect } from 'react'
+import {
+  ActionMenu,
+  Button,
+  ButtonGroup,
+  EmptyState,
+  IconCaretDown,
+  Layout,
+  PageBlock,
+  PageHeader,
+  Spinner,
+  Tabs,
+  Tab,
+} from 'vtex.styleguide'
+import { FormattedMessage } from 'react-intl'
+import { useMutation, useQuery } from 'react-apollo'
+
+import LengowStats from './components/LengowStats'
+import LengowLogs from './components/DY_Logs'
+import GET_LOCALES from './queries/getLocales.gql'
+import GET_CONFIG from './queries/lengowConfig.gql'
+import GET_SALES_CHANNELS from './queries/salesChannel.gql'
+import GET_HOSTS from './queries/getHosts.gql'
+import SAVE_SETTINGS from './queries/saveLengowConfig.gql'
+
+const AdminPanel = () => {
+  const [selectedTab, setSelectedTab] = useState(1)
+  const [saveDisabled, setSaveDisabled] = useState(false)
+  const [productDataCustomFields, setProductDataCustomFields] = useState(1)
+
+  const [productSpecifications, setProductSpecifications] = useState(1)
+  const [skuSpecifications, setSkuSpecifications] = useState(1)
+
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  const [appSettings, setAppSettings] = useState({
+    account: '',
+    apiKey: '',
+    apiSecret: '',
+    vtexApiKey: '',
+    vtexApiToken: '',
+    prefixAffiliateID: 'LNG',
+    domainShop: '',
+    boolSandbox: false,
+    salesChannel: [],
+    locales: [],
+    productDataCustomFields: [],
+    productSpecifications: [],
+    skuSpecifications: [],
+    flagExportDisableSKU: false,
+    flagExportOutOfStockSKU: false,
+    listExludedSkus: '',
+    feedFormat: 'xml',
+  })
+  const [locales, setLocales] = useState([])
+  const [salesChannels, setSalesChannels] = useState([])
+  const [hosts, setHosts] = useState([])
+
+  // Queries
+  const {
+    loading: loadingConfig,
+    error: configError,
+    data: configData,
+  } = useQuery(GET_CONFIG, { ssr: false })
+
+  const {
+    loading: loadingLocales,
+    error: localesError,
+    data: localesData,
+  } = useQuery(GET_LOCALES, {
+    ssr: false,
+  })
+
+  const {
+    loading: loadingSalesChannels,
+    error: salesChannelsError,
+    data: salesChannelsData,
+  } = useQuery(GET_SALES_CHANNELS, {
+    ssr: false,
+  })
+
+  const {
+    loading: loadingHosts,
+    error: hostsError,
+    data: hostsData,
+  } = useQuery(GET_HOSTS, {
+    ssr: false,
+  })
+
+  const [saveAppSettings] = useMutation(SAVE_SETTINGS)
+
+  useEffect(() => {
+    if (!loadingConfig && configData) {
+      setAppSettings(configData.lengowConfig)
+    }
+  }, [configData, loadingConfig])
+
+  useEffect(() => {
+    if (!loadingLocales && localesData) {
+      setLocales(localesData.locales)
+    }
+  }, [loadingLocales, localesData])
+
+  useEffect(() => {
+    if (!loadingSalesChannels && salesChannelsData) {
+      setSalesChannels(salesChannelsData.salesChannels)
+    }
+  }, [loadingSalesChannels, salesChannelsData])
+
+  useEffect(() => {
+    if (!loadingHosts && hostsData) {
+      setHosts(hostsData.hosts)
+    }
+  }, [hostsData, loadingHosts])
+
+  useEffect(() => {
+    if (
+      !loadingConfig &&
+      !loadingLocales &&
+      !loadingSalesChannels &&
+      !loadingHosts
+    ) {
+      setLoading(false)
+    }
+  }, [loadingConfig, loadingHosts, loadingLocales, loadingSalesChannels])
+
+  useEffect(() => {
+    if (configError || localesError || salesChannelsError || hostsError) {
+      setError(true)
+    }
+  }, [configError, hostsError, localesError, salesChannelsError])
+
+  // Handlers
+  const handleTabChange = tabIndex => {
+    setSelectedTab(tabIndex)
+  }
+
+  // eslint-disable-next-line max-params
+  const handleInputChangeArray = (name, key, value, operation) => {
+    const updatedAppSettings = { ...appSettings }
+
+    // eslint-disable-next-line default-case
+    switch (operation) {
+      case 'create': {
+        updatedAppSettings[name].push(value)
+        break
+      }
+
+      case 'update': {
+        updatedAppSettings[name][key] = value
+        break
+      }
+
+      case 'delete': {
+        updatedAppSettings[name].splice(key, 1)
+        break
+      }
+    }
+
+    setAppSettings(updatedAppSettings)
+  }
+
+  const handleAddLineSpecifications = (specification, specificationCounter) => {
+    handleInputChangeArray(
+      specification,
+      null,
+      {
+        id: `${specification}-${specificationCounter}`,
+        specName: '',
+        specXML: '',
+      },
+      'create'
+    )
+
+    if (specification === 'productDataCustomFields') {
+      setProductDataCustomFields(specificationCounter + 1)
+    }
+
+    if (specification === 'productSpecifications') {
+      setProductSpecifications(specificationCounter + 1)
+    }
+
+    if (specification === 'skuSpecifications') {
+      setSkuSpecifications(specificationCounter + 1)
+    }
+  }
+
+  const handleInputChange = (name, value) => {
+    const updatedAppSettings = { ...appSettings, [name]: value }
+    setAppSettings(updatedAppSettings)
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  const saveProductForm = async event => {
+    setSaveDisabled(true)
+
+    window.postMessage({ action: { type: 'START_LOADING' } }, '*')
+
+    const updatedAppSettings = {
+      ...appSettings,
+      salesChannel: JSON.stringify(appSettings.salesChannel),
+      productDataCustomFields: JSON.stringify(
+        appSettings.productDataCustomFields
+      ),
+      productSpecifications: JSON.stringify(appSettings.productSpecifications),
+      skuSpecifications: JSON.stringify(appSettings.skuSpecifications),
+    }
+
+    try {
+      await saveAppSettings({
+        variables: {
+          data: updatedAppSettings,
+        },
+      })
+    } catch (err) {
+      throw new Error('Unable to save settings')
+    }
+
+    setSaveDisabled(false)
+  }
+
+  if (error) {
+    return (
+      <EmptyState>
+        <Spinner />
+        <h5 className="t-heading-5">Something went wrong. Please try again.</h5>
+      </EmptyState>
+    )
+  }
+
+  if (
+    loading ||
+    !configData ||
+    !localesData ||
+    !salesChannelsData ||
+    !hostsData
+  ) {
+    return (
+      <EmptyState>
+        <Spinner />
+        <h5 className="t-heading-5">
+          <FormattedMessage id="admin/dynamic_yield-connector.loading" />
+        </h5>
+      </EmptyState>
+    )
+  }
+
+  const updateFeedButtonOptions = locales.map(locale => ({
+    label: `Update feed for ${locale}`,
+    onClick: () => {
+      console.log(`Update feed for ${locale}`)
+    },
+  }))
+
+  const showFeedButtonOptions = locales.map(locale => ({
+    label: `View feed for ${locale}`,
+    onClick: () => {
+      console.log(`Show feed for ${locale}`)
+    },
+  }))
+
+  return (
+    <Layout
+      fullWidth
+      pageHeader={
+        <PageHeader
+          title={<FormattedMessage id="admin/dynamic_yield-connector.admin-header" />}
+        />
+      }
+    >
+      <PageBlock>
+        <Tabs fullWidth>
+          <Tab
+            className="t-heading-2"
+            label={<FormattedMessage id="admin/dynamic_yield-connector.config-tab-label" />}
+            active={selectedTab === 1}
+            onClick={() => handleTabChange(1)}
+          >
+            <div className="w-100 center">
+              settings
+              <DY_Config
+                lengowConfig={appSettings}
+                salesChannel={salesChannels}
+                locales={locales}
+                hosts={hosts}
+                onChangeArray={handleInputChangeArray}
+                onAddLineSpec={handleAddLineSpecifications}
+                onChange={handleInputChange}
+                saveProductForm={saveProductForm}
+              />
+            </div>
+
+            <div className="center flex">
+              <div className="ma5">
+                <Button disabled={saveDisabled} onClick={saveProductForm}>
+                  <FormattedMessage id="admin/dynamic_yield-connector.config-save-config-button" />
+                </Button>
+              </div>
+
+              <div className="ma5">
+                <ButtonGroup
+                  buttons={[
+                    // eslint-disable-next-line react/jsx-key
+                    <Button
+                      variation="secondary"
+                      isActiveOfGroup
+                      onClick={() => console.log('updateAll')}
+                    >
+                      <FormattedMessage id="admin/dynamic_yield-connector.config-create-feed-button" />
+                    </Button>,
+                    // eslint-disable-next-line react/jsx-key
+                    <ActionMenu
+                      isActiveOfGroup
+                      hideCaretIcon
+                      buttonProps={{
+                        variation: 'secondary',
+                        icon: <IconCaretDown color="currentColor" />,
+                        iconPosition: 'right',
+                      }}
+                      options={updateFeedButtonOptions}
+                    />,
+                  ]}
+                />
+              </div>
+
+              <div className="ma5">
+                <ButtonGroup
+                  variation="secondary"
+                  buttons={[
+                    // eslint-disable-next-line react/jsx-key
+                    <Button
+                      variation="secondary"
+                      isActiveOfGroup
+                      onClick={() => console.log('showAll')}
+                    >
+                      <FormattedMessage id="admin/dynamic_yield-connector.config-show-feed-button" />
+                    </Button>,
+                    // eslint-disable-next-line react/jsx-key
+                    <ActionMenu
+                      isActiveOfGroup
+                      hideCaretIcon
+                      buttonProps={{
+                        variation: 'secondary',
+                        icon: <IconCaretDown />,
+                        iconPosition: 'right',
+                      }}
+                      options={showFeedButtonOptions}
+                    />,
+                  ]}
+                />
+              </div>
+
+              <div className="ma5">
+                <Button
+                  variation="secondary"
+                  className="tc pa2 t-heading-4"
+                  onClick={() => {
+                    window.open('/integration/lengow/importorders', '_blank')
+                  }}
+                >
+                  <FormattedMessage id="admin/dynamic_yield-connector.config-import-orders-button" />
+                </Button>
+              </div>
+            </div>
+          </Tab>
+          <Tab
+            className="t-heading-2"
+            label={<FormattedMessage id="admin/dynamic_yield-connector.stats-tab-label" />}
+            active={selectedTab === 2}
+            onClick={() => handleTabChange(2)}
+          >
+            <LengowStats />
+          </Tab>
+          <Tab
+            className="t-heading-2"
+            label={<FormattedMessage id="admin/dynamic_yield-connector.logs-tab-label" />}
+            active={selectedTab === 3}
+            onClick={() => handleTabChange(3)}
+          >
+            <LengowLogs />
+          </Tab>
+        </Tabs>
+      </PageBlock>
+    </Layout>
+  )
+}
+
+export default AdminPanel

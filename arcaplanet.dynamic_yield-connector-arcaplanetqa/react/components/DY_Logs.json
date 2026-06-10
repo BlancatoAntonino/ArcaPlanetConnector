@@ -1,0 +1,17 @@
+[
+  {
+    "id": "admin/dynamic_yield-connector.logs-select-date"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.logs-log-date"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.logs-title"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.loading"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.logs-no-results"
+  }
+]

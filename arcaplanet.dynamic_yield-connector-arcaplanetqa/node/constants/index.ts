@@ -1,0 +1,11 @@
+export const CANCEL = 'cancel'
+export const INVOICE = 'invoice'
+export const DYNAMIC_YIELD_CONFIG = 'DY-config'
+export const DYNAMIC_YIELD_FEED_JSON = 'DY-feed-json'
+export const DYNAMIC_YIELD_FEED_JSON_INDEX = 'DY-feed-json-index'
+
+export const DYNAMIC_YIELD_FEED_XML = 'DY-feed-xml'
+export const DYNAMIC_YIELD_LOGS = 'DY-logs'
+export const DYNAMIC_YIELD_INTEGRATION = 'DY-integration'
+export const FEED_PRODUCT_IDS = 'feed-product-ids'
+export const FEED_STATUS = 'feed-status'

@@ -1,0 +1,8 @@
+query {
+  appLogs {
+    orderID
+    type
+    msg
+    date
+  }
+}

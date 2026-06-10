@@ -1,0 +1,6 @@
+{
+	"admin.app.dynamic_yield-connector": {
+    	"component": 	"index",
+    	"path": 		"/admin/app/dynamic_yield-connector"
+	}
+}

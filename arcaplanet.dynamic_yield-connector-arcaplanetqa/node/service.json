@@ -1,0 +1,32 @@
+{
+  "stack": "nodejs",
+  "memory": 16096,
+  "ttl": 60,
+  "timeout": 3600,
+  "routes": {
+    "ping": {
+      "path": "/_v/arc/dynamic-yield/ping",
+      "public": true
+    },
+    "feed": {
+      "path": "/_v/arc/dynamic-yield/connector/feed",
+      "public": true
+    },
+    "updateProduct_Bulk": {
+      "path": "/_v/arc/dynamic-yield/connector/bulk/products/update",
+      "public": true
+    },
+    "crateUpdateCronJob": {
+      "path": "/_v/arc/dynamic-yield/connector/create/cronjob",
+      "public": true
+    },
+    "getActiveSkuIds": {
+      "path": "/_v/arc/dynamic-yield/connector/skuids/active",
+      "public": true
+    },
+    "updateFranchiseAccountAvailability": {
+      "path": "/_v/arc/dynamic-yield/connector/update/franchise/availability",
+      "public": true
+    }
+  }
+}

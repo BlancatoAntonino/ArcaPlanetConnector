@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@types/node": "^22.15.21"
+  },
+  "dependencies": {
+    "@mrodrig/json-2-csv-cli": "^5.5.9",
+    "json-2-csv": "^5.5.9",
+    "json-diff": "^1.0.6"
+  }
+}

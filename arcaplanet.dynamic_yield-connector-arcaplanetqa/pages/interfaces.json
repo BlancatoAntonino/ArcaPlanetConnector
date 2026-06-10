@@ -1,0 +1,6 @@
+{
+  "admin.app.dynamic_yield": {
+    "component": "index",
+    "render": "client"
+  }
+}

@@ -1,0 +1,72 @@
+type appSettings {
+  account: String
+  apiKey: String
+  apiSecret: String
+  vtexApiKey: String
+  vtexApiToken: String
+  prefixAffiliateID: String
+  boolSandbox: Boolean
+  salesChannel: String
+  locales: String
+  productSpecifications: String
+  skuSpecifications: String
+  productDataCustomFields: String
+  flagExportDisableSKU: Boolean
+  flagExportOutOfStockSKU: Boolean
+  flagCheckValidGTIN: Boolean
+  listExludedSkus: String
+  feedFormat: String
+  lastDateGenerated: String
+  domainShop: String
+  xmlProductIds: String
+}
+
+input appSettingsInput {
+  account: String
+  apiKey: String
+  apiSecret: String
+  vtexApiKey: String
+  vtexApiToken: String
+  prefixAffiliateID: String
+  boolSandbox: Boolean
+  salesChannel: String
+  locales: String
+  productDataCustomFields: String
+  productSpecifications: String
+  skuSpecifications: String
+  flagExportDisableSKU: Boolean
+  flagExportOutOfStockSKU: Boolean
+  listExludedSkus: String
+  flagCheckValidGTIN: Boolean
+  feedFormat: String
+  domainShop: String
+  xmlProductIds: String
+}
+
+
+type appLogs {
+  orderID: String
+  type: String
+  msg: String
+  date: String
+}
+
+
+
+type salesChannels {
+  Id: ID!
+  Name: String
+}
+
+
+type Query {
+  appSettings: appSettings @auth(scope: PUBLIC)
+  salesChannels: [salesChannels] @auth(scope: PUBLIC)
+  locales: [String] @auth(scope: PUBLIC)
+  hosts: [String] @auth(scope: PUBLIC)
+  appLogs: [appLogs] @auth(scope: PUBLIC)
+}
+
+type Mutation {
+  saveAppSettings(config: appSettingsInput): appSettings @auth(scope: PUBLIC)
+}

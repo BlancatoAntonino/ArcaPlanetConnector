@@ -1,0 +1,53 @@
+[
+  {
+    "id": "admin/dynamic_yield-connector.config-title"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-affiliate-id"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-shop-domain"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-dy-account-id"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-dy-apikey"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-dy-apisecret"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-sales-channel-mapping"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-locale"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-specifications-mapping"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-mapper-product-specs"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-mapper-sku-specs"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-additional-settings"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-feed-format"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-interval-num-days"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-sandbox"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-out-of-stock"
+  },
+  {
+    "id": "admin/dynamic_yield-connector.config-valid-gtin"
+  }
+]

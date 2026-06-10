@@ -1,0 +1,21 @@
+mutation saveDynamicYieldConfig($data: appSettingsInput) {
+  saveAppSettings(config: $data) {
+    account
+    apiKey
+    apiSecret
+    vtexApiKey
+    vtexApiToken
+    boolSandbox
+    salesChannel
+    locales
+    productDataCustomFields
+    productSpecifications
+    skuSpecifications
+    flagExportDisableSKU
+    flagExportOutOfStockSKU
+    flagCheckValidGTIN
+    listExludedSkus
+    feedFormat
+    domainShop
+  }
+}
