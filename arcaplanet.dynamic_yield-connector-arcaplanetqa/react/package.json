@@ -33,6 +33,7 @@
   },
   "resolutions": {
     "expect": "29.7.0",
+    "node-releases": "2.0.36",
     "pretty-format": "29.7.0"
   }
 }

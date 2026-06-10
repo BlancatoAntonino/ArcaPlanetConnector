@@ -1,6 +1,7 @@
 *node_modules/
 *.lock
 *yarn.lock
+!react/yarn.lock
 *.log
 *package-lock.json
 *.code-workspace

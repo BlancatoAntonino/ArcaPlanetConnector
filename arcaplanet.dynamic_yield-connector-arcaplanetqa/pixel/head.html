@@ -1,0 +1,66 @@
+<script>
+  ;(function () {
+    var sectionId = '9881864'
+    var cdnHost = 'cdn-eu.dynamicyield.com'
+    var hosts = [
+      cdnHost,
+      'st-eu.dynamicyield.com',
+      'rcom-eu.dynamicyield.com',
+    ]
+
+    function addPreconnect(host) {
+      // Replica i preconnect suggeriti dallo snippet Dynamic Yield per ridurre la latenza.
+      var href = '//' + host
+      var existing = document.querySelector(
+        'link[rel="preconnect"][href="' + href + '"]'
+      )
+
+      if (existing) {
+        return
+      }
+
+      var link = document.createElement('link')
+      link.rel = 'preconnect'
+      link.href = href
+      document.head.appendChild(link)
+    }
+
+    function loadScript(src) {
+      // Evita di caricare due volte lo stesso script se VTEX reinietta il pixel.
+      var existing = document.querySelector('script[src="' + src + '"]')
+
+      if (existing) {
+        return
+      }
+
+      var script = document.createElement('script')
+      script.type = 'text/javascript'
+      script.async = true
+      script.defer = true
+      script.src = src
+
+      var firstScript = document.getElementsByTagName('script')[0]
+      firstScript.parentNode.insertBefore(script, firstScript)
+    }
+
+    if (!sectionId) {
+      // Senza section ID lasciamo la pagina invariata.
+      return
+    }
+
+    if (window.__arcaDynamicYieldLoaded) {
+      return
+    }
+
+    window.__arcaDynamicYieldLoaded = true
+    window.DY = window.DY || {}
+
+    // Lo snippet DY carica sempre api_dynamic.js e api_static.js per la section configurata.
+    for (var i = 0; i < hosts.length; i++) {
+      addPreconnect(hosts[i])
+    }
+
+    loadScript('//' + cdnHost + '/api/' + sectionId + '/api_dynamic.js')
+    loadScript('//' + cdnHost + '/api/' + sectionId + '/api_static.js')
+  })()
+</script>

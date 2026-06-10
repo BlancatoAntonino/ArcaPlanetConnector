@@ -1,7 +1,7 @@
 {
   "vendor": "arcaplanetqa",
   "name": "dynamic-yield",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.1",
   "title": "Dynamic Yield Connector",
   "icon": "https://www.dynamicyield.com/wp-content/uploads/2019/10/DY-Hero_Logo-Black@x2.png",
   "description": "Dynamic Yield Connector for VTEX (Arcaplanet Custom)",
@@ -12,6 +12,8 @@
     "react": "3.x",
     "admin": "0.x",
     "node": "7.x",
+    "store": "0.x",
+    "pixel": "0.x",
     "messages": "1.x"
   },
   "mustUpdateAt": "2025-08-24",
@@ -20,6 +22,7 @@
     "smartcheckout"
   ],
   "dependencies": {
+    "vtex.pixel-interfaces": "1.x",
     "vtex.styleguide": "9.x",
     "vtex.store-graphql": "2.x"
   },
