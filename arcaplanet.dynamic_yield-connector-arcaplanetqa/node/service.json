@@ -24,6 +24,10 @@
       "path": "/_v/arc/dynamic-yield/connector/skuids/active",
       "public": true
     },
+    "dynamicYieldPixelSettings": {
+      "path": "/_v/arc/dynamic-yield/connector/pixel/settings",
+      "public": true
+    },
     "updateFranchiseAccountAvailability": {
       "path": "/_v/arc/dynamic-yield/connector/update/franchise/availability",
       "public": true

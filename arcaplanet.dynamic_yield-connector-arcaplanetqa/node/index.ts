@@ -14,6 +14,7 @@ import { getAdminSettings, getAppSettings } from './middlewares/appSettings'
 import { asyncRequest } from './middlewares/asyncRequest'
 import { createCronJob } from './middlewares/createCronJob'
 import { createDeltaFeed, createFeed } from './middlewares/createFeed'
+import { dynamicYieldPixelSettings } from './middlewares/dynamicYieldPixelSettings'
 import { feed } from './middlewares/feed'
 import { getFeedStatus } from './middlewares/getFeedStatus'
 import { initLogger } from './middlewares/initLogger'
@@ -101,6 +102,9 @@ export default new Service<Clients, State, ParamsContext>({
     }),
     getActiveSkuIds: method({
       GET: [initLogger, getActiveSkuIds]
+    }),
+    dynamicYieldPixelSettings: method({
+      GET: [initLogger, setDefaultHeaders, getAdminSettings, dynamicYieldPixelSettings]
     }),
     crateUpdateCronJob: method({
       POST: [initLogger, createCronJob]
