@@ -9,12 +9,127 @@
     var settingsPath = '/_v/arc/dynamic-yield/connector/pixel/settings'
     var cdnHost = 'cdn-eu.dynamicyield.com'
     var contextReadyEventName = 'arca:dy-context-ready'
-    var fallbackTimeout = 5000
+    var fallbackTimeout = 3000
+    var dyidServerCookieMaxAge = 31556951
+    var cookiebotEvents = [
+      'CookiebotOnConsentReady',
+      'CookiebotOnAccept',
+      'CookiebotOnDecline',
+    ]
     var hosts = [
       cdnHost,
       'st-eu.dynamicyield.com',
       'rcom-eu.dynamicyield.com',
     ]
+
+    function getCookie(name) {
+      var cookies = document.cookie ? document.cookie.split('; ') : []
+
+      for (var i = 0; i < cookies.length; i++) {
+        var parts = cookies[i].split('=')
+        var cookieName = parts.shift()
+
+        if (cookieName === name) {
+          try {
+            return decodeURIComponent(parts.join('='))
+          } catch (error) {
+            return parts.join('=')
+          }
+        }
+      }
+
+      return ''
+    }
+
+    function getDynamicYieldCookieDomain() {
+      var hostname = window.location.hostname.toLowerCase()
+      var arcaplanetDomain = hostname.match(/(?:^|\.)arcaplanet\.(it|com)$/)
+
+      if (arcaplanetDomain) {
+        return '.arcaplanet.' + arcaplanetDomain[1]
+      }
+
+      return ''
+    }
+
+    function writeCookie(name, value, maxAge) {
+      var domain = getDynamicYieldCookieDomain()
+      var cookie =
+        name +
+        '=' +
+        encodeURIComponent(value) +
+        '; max-age=' +
+        maxAge +
+        '; path=/; SameSite=None; Secure'
+
+      if (domain) {
+        cookie += '; domain=' + domain
+      }
+
+      document.cookie = cookie
+    }
+
+    function deleteCookie(name) {
+      writeCookie(name, '', -1)
+    }
+
+    function getCookiebotMarketingConsent() {
+      if (
+        window.Cookiebot &&
+        window.Cookiebot.consent &&
+        typeof window.Cookiebot.consent.marketing === 'boolean'
+      ) {
+        return window.Cookiebot.consent.marketing
+      }
+
+      var cookieConsent = getCookie('CookieConsent')
+
+      if (/(?:^|[,{])\s*['"]?marketing['"]?\s*:\s*true/i.test(cookieConsent)) {
+        return true
+      }
+
+      if (
+        /(?:^|[,{])\s*['"]?marketing['"]?\s*:\s*false/i.test(cookieConsent)
+      ) {
+        return false
+      }
+
+      return null
+    }
+
+    function syncDyidServerCookie(consentAccepted) {
+      var dyid = getCookie('_dyid')
+
+      if (consentAccepted && dyid) {
+        writeCookie('_dyid_server', dyid, dyidServerCookieMaxAge)
+        return
+      }
+
+      if (consentAccepted === false) {
+        deleteCookie('_dyid_server')
+      }
+    }
+
+    function syncDynamicYieldConsent(notifyDynamicYield) {
+      var cookiebotMarketingConsent = getCookiebotMarketingConsent()
+      var consentAccepted = cookiebotMarketingConsent === true
+
+      window.DY = window.DY || {}
+      window.DY.userActiveConsent = {
+        accepted: consentAccepted,
+      }
+
+      syncDyidServerCookie(cookiebotMarketingConsent)
+
+      if (
+        notifyDynamicYield &&
+        window.DYO &&
+        window.DYO.ActiveConsent &&
+        typeof window.DYO.ActiveConsent.updateConsentAcceptedStatus === 'function'
+      ) {
+        window.DYO.ActiveConsent.updateConsentAcceptedStatus(consentAccepted)
+      }
+    }
 
     function addPreconnect(host) {
       // Replica i preconnect suggeriti dallo snippet Dynamic Yield per ridurre la latenza.
@@ -115,6 +230,7 @@
         return
       }
 
+      syncDynamicYieldConsent(false)
       window.__arcaDynamicYieldLoaded = true
 
       // Dynamic Yield deve trovare window.DY.recommendationContext gia valorizzato
@@ -123,12 +239,29 @@
       loadScript(
         '//' + cdnHost + '/api/' + sectionId + '/api_dynamic.js',
         function () {
-          loadScript('//' + cdnHost + '/api/' + sectionId + '/api_static.js')
+          syncDynamicYieldConsent(true)
+          window.setTimeout(function () {
+            syncDynamicYieldConsent(true)
+          }, 1000)
+
+          loadScript(
+            '//' + cdnHost + '/api/' + sectionId + '/api_static.js',
+            function () {
+              syncDynamicYieldConsent(true)
+            }
+          )
         }
       )
     }
 
     window.DY = window.DY || {}
+    syncDynamicYieldConsent(false)
+
+    for (var eventIndex = 0; eventIndex < cookiebotEvents.length; eventIndex++) {
+      window.addEventListener(cookiebotEvents[eventIndex], function () {
+        syncDynamicYieldConsent(true)
+      })
+    }
 
     // Se React ha gia preparato il context prima che questo pixel si registri,
     // carichiamo subito gli script. Normalmente pero il pixel arriva prima e resta
