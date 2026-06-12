@@ -21,6 +21,7 @@ interface AppSettings {
 interface DynamicYieldSettings {
   hostName: string
   feedId: string
+  dynamicYieldSectionId: string
   api_key: string
   productBatchSize: number
   isFranchiseStock_Enabled: boolean

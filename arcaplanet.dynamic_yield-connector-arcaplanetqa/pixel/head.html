@@ -1,7 +1,13 @@
 <script>
   ;(function () {
+    // Il pixel e responsabile solo del caricamento degli script Dynamic Yield.
+    // Il page context viene preparato dal componente React della TYP, perche solo li
+    // abbiamo accesso ai dati dell'ordine e agli SKU acquistati.
     var sectionId = '9881864'
+    var contextReady = Boolean(window.__arcaDynamicYieldContextReady)
     var cdnHost = 'cdn-eu.dynamicyield.com'
+    var contextReadyEventName = 'arca:dy-context-ready'
+    var fallbackTimeout = 8000
     var hosts = [
       cdnHost,
       'st-eu.dynamicyield.com',
@@ -25,11 +31,16 @@
       document.head.appendChild(link)
     }
 
-    function loadScript(src) {
-      // Evita di caricare due volte lo stesso script se VTEX reinietta il pixel.
+    function loadScript(src, onload) {
+      // Evita di caricare due volte lo stesso script se VTEX reinietta il pixel
+      // o se il fallback e l'evento React arrivano quasi nello stesso momento.
       var existing = document.querySelector('script[src="' + src + '"]')
 
       if (existing) {
+        if (onload) {
+          onload()
+        }
+
         return
       }
 
@@ -38,29 +49,89 @@
       script.async = true
       script.defer = true
       script.src = src
+      script.onload = onload || null
 
       var firstScript = document.getElementsByTagName('script')[0]
       firstScript.parentNode.insertBefore(script, firstScript)
     }
 
-    if (!sectionId) {
-      // Senza section ID lasciamo la pagina invariata.
-      return
+    function maybeLoadDynamicYieldScripts() {
+      if (!contextReady) {
+        return
+      }
+
+      if (!sectionId) {
+        console.warn('Dynamic Yield section ID is not configured')
+        return
+      }
+
+      window.__arcaLoadDynamicYieldScripts()
+    }
+
+    function onContextReady() {
+      contextReady = true
+      maybeLoadDynamicYieldScripts()
     }
 
     if (window.__arcaDynamicYieldLoaded) {
       return
     }
 
-    window.__arcaDynamicYieldLoaded = true
+    window.__arcaLoadDynamicYieldScripts = function () {
+      if (window.__arcaDynamicYieldLoaded) {
+        return
+      }
+
+      window.__arcaDynamicYieldLoaded = true
+
+      // Dynamic Yield deve trovare window.DY.recommendationContext gia valorizzato
+      // quando api_dynamic.js viene eseguito. Per questo il loader viene chiamato
+      // dall'evento React, dopo che il context CART e stato scritto.
+      loadScript(
+        '//' + cdnHost + '/api/' + sectionId + '/api_dynamic.js',
+        function () {
+          loadScript('//' + cdnHost + '/api/' + sectionId + '/api_static.js')
+        }
+      )
+    }
+
     window.DY = window.DY || {}
 
-    // Lo snippet DY carica sempre api_dynamic.js e api_static.js per la section configurata.
+    // Se React ha gia preparato il context prima che questo pixel si registri,
+    // carichiamo subito gli script. Normalmente pero il pixel arriva prima e resta
+    // in ascolto dell'evento emesso dal componente DynamicYieldPurchase.
+    if (window.__arcaDynamicYieldContextReady) {
+      contextReady = true
+      maybeLoadDynamicYieldScripts()
+    } else {
+      // Il pixel resta il proprietario del caricamento script, ma aspetta React:
+      // React legge l'ordine, imposta recommendationContext e poi emette questo evento.
+      window.addEventListener(
+        contextReadyEventName,
+        onContextReady
+      )
+    }
+
+    // Fallback difensivo: se per qualche motivo il componente React non parte, dopo
+    // alcuni secondi carichiamo comunque DY con un context generico per non bloccare
+    // completamente lo script di base.
+    window.setTimeout(function () {
+      if (window.__arcaDynamicYieldLoaded) {
+        return
+      }
+
+      window.DY.recommendationContext =
+        window.DY.recommendationContext || {
+          type: 'OTHER',
+          data: ['order_placed'],
+        }
+
+      contextReady = true
+      maybeLoadDynamicYieldScripts()
+    }, fallbackTimeout)
+
     for (var i = 0; i < hosts.length; i++) {
       addPreconnect(hosts[i])
     }
-
-    loadScript('//' + cdnHost + '/api/' + sectionId + '/api_dynamic.js')
-    loadScript('//' + cdnHost + '/api/' + sectionId + '/api_static.js')
   })()
 </script>

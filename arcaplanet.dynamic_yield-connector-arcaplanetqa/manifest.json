@@ -1,7 +1,7 @@
 {
   "vendor": "arcaplanetqa",
   "name": "dynamic-yield",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.1-beta.4",
   "title": "Dynamic Yield Connector",
   "icon": "https://www.dynamicyield.com/wp-content/uploads/2019/10/DY-Hero_Logo-Black@x2.png",
   "description": "Dynamic Yield Connector for VTEX (Arcaplanet Custom)",
@@ -52,6 +52,12 @@
           "feedId": {
             "title": "Product feedId",
             "type": "string"
+          },
+          "dynamicYieldSectionId": {
+            "title": "Dynamic Yield section ID",
+            "description": "Dynamic Yield site/section ID used to load api_dynamic.js and api_static.js.",
+            "type": "string",
+            "default": "9881864"
           },
           "api_key": {
             "title": "Api key",
